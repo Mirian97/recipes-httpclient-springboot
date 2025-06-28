@@ -12,10 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.quispe.recipes.domain.dto.ErrorResponse;
 import com.quispe.recipes.domain.dto.UpdateRecipeDTO;
 import com.quispe.recipes.domain.entity.Recipe;
 import com.quispe.recipes.domain.entity.RecipeListResponse;
 import com.quispe.recipes.domain.exception.ExternalApiException;
+import com.quispe.recipes.domain.exception.RecipeNotFoundException;
 
 @Service
 public class RecipeService {
@@ -36,7 +38,7 @@ public class RecipeService {
       HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
       if (response.statusCode() != 200) {
-        throw new ExternalApiException("Error when get recipes - status " + response.statusCode());
+        throw new ExternalApiException(objectMapper.readValue(response.body(), ErrorResponse.class).message());
       }
 
       return objectMapper.readValue(response.body(), RecipeListResponse.class).recipes();
@@ -54,7 +56,7 @@ public class RecipeService {
       HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
       if (response.statusCode() != 200) {
-        throw new ExternalApiException("Error when get recipe - status " + response.statusCode());
+        throw new RecipeNotFoundException(objectMapper.readValue(response.body(), ErrorResponse.class).message());
       }
 
       return objectMapper.readValue(response.body(), Recipe.class);
@@ -72,7 +74,7 @@ public class RecipeService {
       HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
       if (response.statusCode() != 200) {
-        throw new ExternalApiException("Error when get recipes - status " + response.statusCode());
+        throw new ExternalApiException(objectMapper.readValue(response.body(), ErrorResponse.class).message());
       }
 
       return objectMapper.readValue(response.body(), RecipeListResponse.class).recipes();
@@ -91,7 +93,7 @@ public class RecipeService {
           .build();
       HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
       if (response.statusCode() != 200) {
-        throw new ExternalApiException("Error when create a recipe - status " + response.statusCode());
+        throw new ExternalApiException(objectMapper.readValue(response.body(), ErrorResponse.class).message());
       }
 
       return objectMapper.readValue(response.body(), Recipe.class);
@@ -111,7 +113,7 @@ public class RecipeService {
           .build();
       HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
       if (response.statusCode() != 200) {
-        throw new ExternalApiException("Error when update a recipe:" + response.body());
+        throw new RecipeNotFoundException(objectMapper.readValue(response.body(), ErrorResponse.class).message());
       }
 
       return objectMapper.readValue(response.body(), Recipe.class);
@@ -129,7 +131,7 @@ public class RecipeService {
       HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
       if (response.statusCode() != 200) {
-        throw new ExternalApiException("Error when delete a recipe - status " + response.statusCode());
+        throw new RecipeNotFoundException(objectMapper.readValue(response.body(), ErrorResponse.class).message());
       }
 
       return objectMapper.readValue(response.body(), Recipe.class);
